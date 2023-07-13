@@ -14,14 +14,14 @@ namespace Lab3API.Controllers
             };
 
         // 1. Get All Users (Get)
-        [HttpGet]
+        [HttpGet("GetAllUsers")]
         public async Task<ActionResult<List<Lab3>>> Get()
         {
             return Ok(users);
         }
 
         // 2. Get a user detail by providing user ID (Get)
-        [HttpGet("userDetailById")]
+        [HttpGet("GetUserDetailById")]
         public async Task<ActionResult<Lab3>> Get(int userDetailById)
         {
             var user = users.Find(i => i.studentId == userDetailById);
@@ -36,7 +36,7 @@ namespace Lab3API.Controllers
         }
 
         // 3. Add a new user (Post)
-        [HttpPost]
+        [HttpPost("AddUser")]
         public async Task<ActionResult<List<Lab3>>> AddUser(Lab3 user)
         {
             users.Add(user);
@@ -44,7 +44,20 @@ namespace Lab3API.Controllers
         }
 
         // 4. Update existing user (Put) 
-
+        [HttpPut("UpdateUserById")]
+        public async Task<ActionResult<List<Lab3>>> UpdateUser(Lab3 updateRequest)
+        {
+            var user = users.Find(i => i.studentId == updateRequest.studentId);
+            if (user == null)
+            {
+                return BadRequest("User not found");
+            }
+            else
+            {
+                user.name = updateRequest.name;
+                return Ok(users);
+            }
+        }
 
     }
 }
