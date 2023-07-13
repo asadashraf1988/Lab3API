@@ -12,19 +12,24 @@ namespace Lab3API.Controllers
                 new Lab3 { studentId = 8864578, name = "Asad" },
                 new Lab3 { studentId = 8864000, name = "Dummy" }
             };
+        private readonly DataContext context;
+
+        public Lab3Controller(DataContext context) {
+            this.context = context;
+        }
 
         // 1. Get All Users (Get)
         [HttpGet("GetAllUsers")]
         public async Task<ActionResult<List<Lab3>>> Get()
         {
-            return Ok(users);
+            return Ok(await context.Lab3Users.ToListAsync());
         }
 
         // 2. Get a user detail by providing user ID (Get)
         [HttpGet("GetUserDetailById")]
         public async Task<ActionResult<Lab3>> Get(int userDetailById)
         {
-            var user = users.Find(i => i.studentId == userDetailById);
+            var user = await context.Lab3Users.FindAsync(userDetailById);
             if (user == null)
             {
                 return BadRequest("User not found");
@@ -39,15 +44,16 @@ namespace Lab3API.Controllers
         [HttpPost("AddUser")]
         public async Task<ActionResult<List<Lab3>>> AddUser(Lab3 user)
         {
-            users.Add(user);
-            return Ok(user);
+            context.Lab3Users.Add(user);
+            await context.SaveChangesAsync();
+            return Ok(await context.Lab3Users.ToListAsync());
         }
 
         // 4. Update existing user (Put) 
-        [HttpPut("UpdateUserById")]
+        [HttpPut("UapdateUserById")]
         public async Task<ActionResult<List<Lab3>>> UpdateUser(Lab3 updateRequest)
         {
-            var user = users.Find(i => i.studentId == updateRequest.studentId);
+            var user = await context.Lab3Users.FindAsync(updateRequest.studentId);
             if (user == null)
             {
                 return BadRequest("User not found");
@@ -55,7 +61,9 @@ namespace Lab3API.Controllers
             else
             {
                 user.name = updateRequest.name;
-                return Ok(users);
+                await context.SaveChangesAsync();
+
+                return Ok(await context.Lab3Users.ToListAsync());
             }
         }
 
